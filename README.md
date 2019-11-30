@@ -37,6 +37,7 @@ Config data:
  * maxMins: In mode 100, -2 and -1, the smoker is turned off after maxMins minutes
  * onMins: In mode -1, the smoker is on for onMins
  * offMins: In mode -1, the smoker is off for offMins
+
 Initial config data: 
  * ssid: Wifi network ssid
  * password: Wifi network password
@@ -45,5 +46,20 @@ Initial config data:
  * registry_id: For example "smoker-registry",
  * device_id: For example "smoker-device"
 
+Create private key
+openssl ecparam -genkey -name prime256v1 -noout -out ec_private.pem
+openssl ec -in ec_private.pem -pubout -out ec_public.pem
+openssl ec -in ec_private.pem -noout -text | sed -n -e '/priv:/ {n;p;n;p;n;p}' | sed -e 's,^ *,",' -e 's,$,",' > ec_private.h
+
 Set config example:
 gcloud iot devices configs update --region=europe-west1 --registry=smoker-registry --device=smoker-device --config-data="{min:60,max:80,mode:-2}"
+
+Pins
+RELAY_PIN = 13; // D7
+THERMO_SO = 12; // D6
+THERMO_CS = 15; // D8
+THERMO_CLK = 14; // D5
+OLED_CLK = 5; // D1
+OLED_DATA = 4; // D2, SDA
+
+[/code]
