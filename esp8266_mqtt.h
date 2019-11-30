@@ -45,7 +45,9 @@ String getJwt()
   // Disable software watchdog as these operations can take a while.
   ESP.wdtDisable();
   iss = time(nullptr);
+#if XSERIAL
   Serial.println("Refreshing JWT");
+#endif
   jwt = device->createJWT(iss, jwt_exp_secs);
   ESP.wdtEnable(0);
   return jwt;
@@ -67,22 +69,30 @@ void setupCert()
   File ca = SPIFFS.open("/primary_ca.pem", "r");
   if (!ca)
   {
+#if XSERIAL
     Serial.println("Failed to open ca file");
+#endif
   }
   else
   {
+#if XSERIAL
     Serial.println("Success to open ca file");
+#endif
     certList.append(strdup(ca.readString().c_str()));
   }
 
   ca = SPIFFS.open("/backup_ca.pem", "r");
   if (!ca)
   {
+#if XSERIAL
     Serial.println("Failed to open ca file");
+#endif
   }
   else
   {
+#if XSERIAL
     Serial.println("Success to open ca file");
+#endif
     certList.append(strdup(ca.readString().c_str()));
   }
 
@@ -93,14 +103,18 @@ void setupWifi()
 {
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
+#if XSERIAL
   Serial.println("Connecting to WiFi");
+#endif
   while (WiFi.status() != WL_CONNECTED)
   {
     delay(100);
   }
 
   configTime(0, 0, ntp_primary, ntp_secondary);
+#if XSERIAL
   Serial.println("Waiting on time sync...");
+#endif
   while (time(nullptr) < 1510644967)
   {
     delay(10);
@@ -109,7 +123,9 @@ void setupWifi()
 
 void connectWifi()
 {
+#if XSERIAL
   Serial.print("checking wifi..."); // TODO: Necessary?
+#endif
   while (WiFi.status() != WL_CONNECTED)
   {
     Serial.print(".");

@@ -9,6 +9,7 @@
 #define XOLED 1
 #define XTHERMO 1
 #define XSERIAL 1
+#define XCLOUD 1
 
 #define AUTO_TEMP -2
 #define AUTO_TIME -1
@@ -45,6 +46,14 @@ U8G2_SSD1306_128X32_UNIVISION_F_HW_I2C u8g2(U8G2_R2, /* reset=*/ OLED_RESET, /* 
 #undef LED_BUILTIN
 #endif
 
+#if XCLOUD
+#include <CloudIoTCore.h>
+#include "esp8266_mqtt.h"
+#endif
+
+#include <ArduinoJson.h>
+#include <FS.h>
+
 String config = "{}";
 int16_t minC = 60;
 int16_t maxC = 90;
@@ -57,11 +66,6 @@ unsigned long lastMillis = 0;
 static uint8_t power;
 static uint8_t lastPower;
 boolean doSendState;
-
-#include <ArduinoJson.h>
-#include <CloudIoTCore.h>
-
-#include "esp8266_mqtt.h"
 
 void setup()
 {
@@ -90,6 +94,22 @@ void setup()
   u8g2.sendBuffer ();
 #endif
 
+  readConfig();
+
+#if XCLOUD
+  setupCloudIoT(); // Creates globals for MQTT
+#endif
+
+#if XTHERMO
+  thermocouple.begin(THERMO_CLK, THERMO_CS, THERMO_SO);
+#endif
+
+#ifdef LED_BUILTIN
+  digitalWrite(LED_BUILTIN, 1);
+#endif
+}
+
+static void readConfig() {
   if (SPIFFS.begin()) {
     File cf = SPIFFS.open("/config.json", "r");
     if (!cf) {
@@ -121,17 +141,7 @@ void setup()
     }
   }
 
-  setupCloudIoT(); // Creates globals for MQTT
-
-#if XTHERMO
-  thermocouple.begin(THERMO_CLK, THERMO_CS, THERMO_SO);
-#endif
-
-#ifdef LED_BUILTIN
-  digitalWrite(LED_BUILTIN, 1);
-#endif
 }
-
 
 static void setOn() {
   digitalWrite(RELAY_PIN, HIGH);
@@ -143,6 +153,7 @@ static void setOff() {
 
 void loop()
 {
+#if XCLOUD
   mqttClient->loop();
   delay(10);
 
@@ -163,6 +174,7 @@ void loop()
 #endif
     doSendState = true;
   }
+#endif
 
   unsigned long currentMillis = millis();
   unsigned long secs = (unsigned long)(currentMillis / 1000); // !!
@@ -185,12 +197,14 @@ void loop()
   uint8_t min = mins % 60;
   uint8_t sec = secs % 60;
 
+#if XCLOUD
   if (doSendState && sec == 0) {
     doSendState = false;
     ESP.wdtDisable();
     sendState();
     ESP.wdtEnable(0);
   }
+#endif
 
 #if XTHERMO
   double temp = thermocouple.readCelsius();
@@ -301,6 +315,7 @@ void loop()
   u8g2.sendBuffer ();
 #endif
 
+#if XCLOUD
   if (currentMillis - lastMillis > 20000)
   {
     lastMillis = currentMillis;
@@ -330,9 +345,11 @@ void loop()
     publishTelemetry(data);
     ESP.wdtEnable(0);
   }
+#endif
 }
 
 
+#if XCLOUD
 void sendState() {
   StaticJsonDocument<200> doc;
 
@@ -353,6 +370,7 @@ void sendState() {
   publishState(output);
   mqtt->logReturnCode();
 }
+#endif
 
 void messageReceived(String &topic, String &payload)
 {
@@ -390,6 +408,7 @@ void messageReceived(String &topic, String &payload)
   if (doc.containsKey("offMins")) {
     offMins = doc["offMins"];
   }
+#if XCLOUD
   if (doc.containsKey("ssid")) {
     ssid = doc["ssid"];
   }
@@ -408,6 +427,7 @@ void messageReceived(String &topic, String &payload)
   if (doc.containsKey("device_id")) {
     device_id = doc["device_id"];
   }
+#endif
 
 #if 0
   if (!config.equals(payload)) {
