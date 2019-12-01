@@ -1,6 +1,9 @@
 # CloudSmoker
 Google Cloud IoT Smoker
 
+Based on 
+https://github.com/Nilhcem/esp32-cloud-iot-core-k8s
+
 ![setup](/img/IMG_20191130_160347.jpg)
 
 Hardware
@@ -19,10 +22,7 @@ Software
  * Google Clound IoT queues
  * InfluxDB and Grafana in Google Cloud Kubernetes cluster
 
-Based on 
-https://github.com/Nilhcem/esp32-cloud-iot-core-k8s
-
-![graph](img/Screenshot_2019-12-01 Grafana - Smoker.png)
+![graph](/img/Screenshot_2019-12-01 Grafana - Smoker.png)
 
 
 See also
@@ -68,5 +68,3 @@ THERMO_CS = 15; // D8
 THERMO_CLK = 14; // D5
 OLED_CLK = 5; // D1
 OLED_DATA = 4; // D2, SDA
-
-[/code]
