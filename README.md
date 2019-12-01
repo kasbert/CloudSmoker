@@ -1,6 +1,8 @@
 # CloudSmoker
 Google Cloud IoT Smoker
 
+![setup](/img/IMG_20191130_160347.jpg)
+
 Hardware
  * WeMos D1 Mini ESP8266
  * SD1306 128x32 OLED display
@@ -10,6 +12,8 @@ Hardware
  * Case
  * Electric Smoker
  
+![schematic](/img/Schematic_smoker_CloudSmoker_20191201204111.svg)
+
 Software
  * Arduino ESP8266 firmware
  * Google Clound IoT queues
@@ -17,6 +21,9 @@ Software
 
 Based on 
 https://github.com/Nilhcem/esp32-cloud-iot-core-k8s
+
+![graph](img/Screenshot_2019-12-01 Grafana - Smoker.png)
+
 
 See also
 https://github.com/SirUli/Grill-Temperature-ESP8266-MAX6675
