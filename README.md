@@ -1,22 +1,29 @@
 # CloudSmoker
 Google Cloud IoT Smoker
 
+Based on 
+https://github.com/Nilhcem/esp32-cloud-iot-core-k8s
+
+![setup](/img/IMG_20191130_160347.jpg)
+
 Hardware
  * WeMos D1 Mini ESP8266
  * SD1306 128x32 OLED display
  * MAX6675 Thermocouple
  * SSR relay
- * FET
+ * FET for controlling relay, if 3.3V is not enough
  * Case
  * Electric Smoker
  
+![schematic](/img/Schematic_smoker_CloudSmoker_20191201204111.svg)
+
 Software
  * Arduino ESP8266 firmware
  * Google Clound IoT queues
  * InfluxDB and Grafana in Google Cloud Kubernetes cluster
 
-Based on 
-https://github.com/Nilhcem/esp32-cloud-iot-core-k8s
+![graph](/img/Screenshot_2019-12-01%20Grafana%20-%20Smoker.png)
+
 
 See also
 https://github.com/SirUli/Grill-Temperature-ESP8266-MAX6675
@@ -47,19 +54,21 @@ Initial config data:
  * device_id: For example "smoker-device"
 
 Create private key
+```
 openssl ecparam -genkey -name prime256v1 -noout -out ec_private.pem
 openssl ec -in ec_private.pem -pubout -out ec_public.pem
 openssl ec -in ec_private.pem -noout -text | sed -n -e '/priv:/ {n;p;n;p;n;p}' | sed -e 's,^ *,",' -e 's,$,",' > ec_private.h
+```
 
 Set config example:
+```
 gcloud iot devices configs update --region=europe-west1 --registry=smoker-registry --device=smoker-device --config-data="{min:60,max:80,mode:-2}"
+```
 
 Pins
-RELAY_PIN = 13; // D7
-THERMO_SO = 12; // D6
-THERMO_CS = 15; // D8
-THERMO_CLK = 14; // D5
-OLED_CLK = 5; // D1
-OLED_DATA = 4; // D2, SDA
-
-[/code]
+ * RELAY_PIN = 13; // D7
+ * THERMO_SO = 12; // D6
+ * THERMO_CS = 15; // D8
+ * THERMO_CLK = 14; // D5
+ * OLED_CLK = 5; // D1
+ * OLED_DATA = 4; // D2, SDA
