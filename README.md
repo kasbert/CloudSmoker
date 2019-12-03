@@ -22,6 +22,10 @@ Software
  * Google Clound IoT queues
  * InfluxDB and Grafana in Google Cloud Kubernetes cluster
 
+![graph](/img/CloudSmoker.svg)
+
+Grafana graph showing power, temperature & limits: 
+
 ![graph](/img/Screenshot_2019-12-01%20Grafana%20-%20Smoker.png)
 
 
