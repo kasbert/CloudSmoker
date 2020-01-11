@@ -4,7 +4,7 @@
 // Flash Size 512kB (32k SPIFFS)
 
 #define PROJECT "SMOKER"
-#define VERSION "0.1"
+#define VERSION "0.2"
 
 #define XOLED 1
 #define XTHERMO 1
@@ -118,11 +118,7 @@ static void readConfig() {
 #endif
     } else {
       String config = cf.readString();
-#if XSERIAL
-      Serial.println("Config:");
-      Serial.println(config);
-#endif
-      String topic = String("initial");
+      String topic = String("/config.json");
       messageReceived(topic, config);
     }
     cf = SPIFFS.open("/config2.json", "r");
@@ -132,11 +128,7 @@ static void readConfig() {
 #endif
     } else {
       String config = cf.readString();
-#if XSERIAL
-      Serial.println("Config2:");
-      Serial.println(config);
-#endif
-      String topic = String("initial");
+      String topic = String("/config2.json");
       messageReceived(topic, config);
     }
   }
@@ -378,7 +370,7 @@ void messageReceived(String &topic, String &payload)
 #if XSERIAL
   Serial.println("incoming: " + topic + " - " + payload);
 #endif
-  StaticJsonDocument<200> doc;
+  StaticJsonDocument<400> doc;
   DeserializationError error = deserializeJson(doc, payload);
 
   // Test if parsing succeeds.
@@ -409,24 +401,38 @@ void messageReceived(String &topic, String &payload)
     offMins = doc["offMins"];
   }
 #if XCLOUD
+  static char s_ssid[32];
+  static char s_password[32];
+  static char s_project_id[32];
+  static char s_location[32];
+  static char s_registry_id[32];
+  static char s_device_id[32];
   if (doc.containsKey("ssid")) {
-    ssid = doc["ssid"];
+    ssid = s_ssid;
+    strncpy(s_ssid, doc["ssid"], 32);
   }
   if (doc.containsKey("password")) {
-    password = doc["password"];
+    strncpy(s_password, doc["password"], 32);
+    password = s_password;
   }
   if (doc.containsKey("project_id")) {
-    project_id = doc["project_id"];
+    strncpy(s_project_id, doc["project_id"], 32);
+    project_id = s_project_id;
   }
   if (doc.containsKey("location")) {
-    location = doc["location"];
+    strncpy(s_location, doc["location"], 32);
+    location = s_location;
   }
   if (doc.containsKey("registry_id")) {
-    registry_id = doc["registry_id"];
+    strncpy(s_registry_id, doc["registry_id"], 32);
+    registry_id = s_registry_id;
   }
   if (doc.containsKey("device_id")) {
-    device_id = doc["device_id"];
+    strncpy(s_device_id, doc["device_id"], 32);
+    device_id = s_device_id;
   }
+  s_ssid[31] = s_password[31] = s_project_id[31] = 
+  s_location[31] = s_registry_id[31] = s_device_id[31] = 0;
 #endif
 
 #if 0
