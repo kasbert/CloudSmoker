@@ -76,3 +76,7 @@ Pins
  * THERMO_CLK = 14; // D5
  * OLED_CLK = 5; // D1
  * OLED_DATA = 4; // D2, SDA
+ 
+ # User interface
+ User interface reads and writes config messages and fetches latest data from influxdb.
+ https://github.com/kasbert/CloudSmoker-UI
